@@ -4,8 +4,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Operations;
 using Microsoft.EntityFrameworkCore;
 using SistemaProdutos.Context;
+using SistemaProdutos.Filters;
 using SistemaProdutos.Models;
 
 namespace SistemaProdutos.Controllers
@@ -23,6 +26,7 @@ namespace SistemaProdutos.Controllers
 
         // GET: api/Categorias
         [HttpGet]
+        [ServiceFilter(typeof(ApiLoggingFilter))] // Aplicando o filtro
         public async Task<ActionResult<IEnumerable<Categoria>>> GetCategorias()
         {
             try
@@ -41,6 +45,8 @@ namespace SistemaProdutos.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Categoria>> GetCategoria(int id)
         {
+            //throw new Exception("Erro de teste para verificar o tratamento global de exceções.");
+
             var categoria = await _context.Categorias.FindAsync(id);
 
             if (categoria == null)

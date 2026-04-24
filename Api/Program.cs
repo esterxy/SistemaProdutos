@@ -1,5 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using SistemaProdutos.Context;
+using SistemaProdutos.Extensions;
+using SistemaProdutos.Filters;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,6 +18,7 @@ string mySqlConnection = builder.Configuration.GetConnectionString("ConexaoPadra
 builder.Services.AddDbContext<AppDbContext>(options =>
 options.UseMySQL(mySqlConnection)
 );
+builder.Services.AddScoped<ApiLoggingFilter>();
 
 var app = builder.Build();
 
@@ -24,6 +28,7 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
     app.UseSwagger();
     app.UseSwaggerUI();
+    app.ConfigureExceptionHandler();
 }
 
 app.UseHttpsRedirection();
