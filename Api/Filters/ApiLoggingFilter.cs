@@ -15,7 +15,7 @@ namespace SistemaProdutos.Filters
         public void OnActionExecuted(ActionExecutedContext context)
         {
             // executado após a ação do controlador ser executada
-            _logger.LogInformation("##### Exectutando -> OnActionExecuted");
+            _logger.LogInformation("##### Executando -> OnActionExecuted");
             _logger.LogInformation("############################################");
             _logger.LogInformation($" {DateTime.Now.ToLongTimeString}");
             _logger.LogInformation($"Status Code : {context.HttpContext.Response.StatusCode}");
@@ -25,7 +25,7 @@ namespace SistemaProdutos.Filters
         public void OnActionExecuting(ActionExecutingContext context)
         {
             // executado antes da ação do controlador ser executada
-            _logger.LogInformation("##### Exectutando -> OnActionExecuting");
+            _logger.LogInformation("##### Executando -> OnActionExecuting");
             _logger.LogInformation("############################################");
             _logger.LogInformation($" {DateTime.Now.ToLongTimeString}");
             _logger.LogInformation($"ModelState : {context.ModelState.IsValid}");

@@ -18,10 +18,14 @@ namespace SistemaProdutos.Controllers
     public class CategoriasController : ControllerBase
     {
         private readonly AppDbContext _context;
+        private readonly ILogger _logger;
 
-        public CategoriasController(AppDbContext context)
+        public CategoriasController(AppDbContext context,
+            ILogger<CategoriasController> logger
+            )
         {
             _context = context;
+            _logger = logger;
         }
 
         // GET: api/Categorias
@@ -29,16 +33,17 @@ namespace SistemaProdutos.Controllers
         [ServiceFilter(typeof(ApiLoggingFilter))] // Aplicando o filtro
         public async Task<ActionResult<IEnumerable<Categoria>>> GetCategorias()
         {
+            _logger.LogInformation("------------------------Iniciando a execução do método GetCategorias.------------------------");
             try
             {
-      
+
                 return await _context.Categorias.ToListAsync();
             }
             catch (Exception)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, "Ocorreu um erro ao processar a solicitação.");
             }
-            
+
         }
 
         // GET: api/Categorias/5
@@ -47,11 +52,15 @@ namespace SistemaProdutos.Controllers
         {
             //throw new Exception("Erro de teste para verificar o tratamento global de exceções.");
 
+            _logger.LogInformation($"=========================== Iniciando a execução do método GetCategoria com id: {id}. ===========================");
+
             var categoria = await _context.Categorias.FindAsync(id);
 
             if (categoria == null)
             {
+                _logger.LogInformation($"=========================== Categoria com id: {id} não encontrada. =========================== ");
                 return NotFound();
+               
             }
 
             return categoria;
