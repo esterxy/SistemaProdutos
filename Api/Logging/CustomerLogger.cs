@@ -1,4 +1,6 @@
-﻿namespace SistemaProdutos.Logging
+﻿using System.Text;
+
+namespace SistemaProdutos.Logging
 {
     public class CustomerLogger : ILogger
     {
@@ -11,37 +13,45 @@
             loggerConfig = config;
         }
 
-        IDisposable? ILogger.BeginScope<TState>(TState state)
+        public IDisposable? BeginScope<TState>(TState state) where TState : notnull => null;
+
+        public bool IsEnabled(LogLevel logLevel)
         {
-            return null;
+            // Verifica se o nível de log está habilitado na configuração
+            return loggerConfig != null && logLevel >= loggerConfig.LogLevel;
         }
 
-        bool ILogger.IsEnabled(LogLevel logLevel)
+        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
         {
-            return logLevel == loggerConfig?.LogLevel;
-        }
+            if (!IsEnabled(logLevel) || formatter == null) return;
 
-        void ILogger.Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
-        {
-            string mensagem = $"{logLevel.ToString()} {eventId.Id} - {formatter (state, exception)}";
+            string mensagem = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} [{logLevel}] {eventId.Id} - {formatter(state, exception)}";
+
+            if (exception != null)
+            {
+                mensagem += $" | Exception: {exception.Message} | StackTrace: {exception.StackTrace}";
+            }
+
             EscreverTextoNoArquivo(mensagem);
         }
-        void EscreverTextoNoArquivo (string mensagem)
+
+        private void EscreverTextoNoArquivo(string mensagem)
         {
+            // Dica: Certifique-se de que este caminho existe e o app tem permissão de escrita
             string caminhoArquivoLog = @"C:\Users\231.918058\Downloads\Ester.txt";
 
-            using (StreamWriter streamWriter = new StreamWriter (caminhoArquivoLog, true))
+            try
             {
-                try
+                // Usar 'using' garante que o arquivo seja fechado corretamente
+                using (StreamWriter streamWriter = new StreamWriter(caminhoArquivoLog, true, Encoding.UTF8))
                 {
                     streamWriter.WriteLine(mensagem);
-                    streamWriter.Close();
                 }
-
-                catch (Exception)
-                {
-                    throw;
-                }
+            }
+            catch (Exception ex)
+            {
+                // Não damos 'throw' aqui para não travar a aplicação se o disco estiver cheio ou sem permissão
+                Console.WriteLine($"FALHA NO LOGGER: {ex.Message}");
             }
         }
     }

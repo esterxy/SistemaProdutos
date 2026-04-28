@@ -15,17 +15,20 @@ namespace SistemaProdutos.Controllers
     public class ProdutosController : ControllerBase
     {
         private readonly AppDbContext _context;
+        private readonly ILogger _logger;
 
 
-        public ProdutosController(AppDbContext context)
+        public ProdutosController(AppDbContext context, ILogger <ProdutosController>logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         // GET: api/Produtos
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Produto>>> GetProdutos()
         {
+            _logger.LogInformation($"=========================== Iniciando a execução do método GetProdutos ===========================");
             return await _context.Produtos.ToListAsync();
         }
 
@@ -37,9 +40,10 @@ namespace SistemaProdutos.Controllers
 
             if (produto == null)
             {
+                _logger.LogInformation($"=========================== Produto com id: {id} não encontrada. =========================== ");
                 return NotFound();
             }
-
+            _logger.LogInformation($"=========================== Iniciando a execução do método GetProdutos {id} ===========================");
             return produto;
         }
 

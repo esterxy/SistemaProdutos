@@ -1,32 +1,28 @@
 ﻿using System.Collections.Concurrent;
+using Microsoft.Extensions.Logging;
 
 namespace SistemaProdutos.Logging
 {
     public class CustomerLoggerProvider : ILoggerProvider
     {
         readonly CustomerLoggerProviderConfiguration loggerConfig;
-        readonly ConcurrentDictionary<String, CustomerLogger> loggers =
+        readonly ConcurrentDictionary<string, CustomerLogger> loggers =
             new ConcurrentDictionary<string, CustomerLogger>();
 
-        public CustomerLoggerProvider (CustomerLoggerProviderConfiguration config)
+        public CustomerLoggerProvider(CustomerLoggerProviderConfiguration config)
         {
             loggerConfig = config;
         }
+
         public ILogger CreateLogger(string categoryName)
         {
-            return loggers.GetOrAdd(categoryName, name => CustomerLogger(name, loggerConfig));
+            return loggers.GetOrAdd(categoryName, name => new CustomerLogger(name, loggerConfig));
         }
 
-        private CustomerLogger CustomerLogger(string name, CustomerLoggerProviderConfiguration loggerConfig)
-        {
-            return null;
-        }
-
+       
         public void Dispose()
         {
             loggers.Clear();
         }
-
-        
     }
 }
