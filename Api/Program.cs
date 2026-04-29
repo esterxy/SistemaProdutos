@@ -3,6 +3,7 @@ using SistemaProdutos.Context;
 using SistemaProdutos.Extensions;
 using SistemaProdutos.Filters;
 using SistemaProdutos.Logging;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,6 +28,14 @@ builder.Logging.AddProvider(new CustomerLoggerProvider(new CustomerLoggerProvide
 {
     LogLevel = LogLevel.Information
 }));
+builder.Services.AddControllers(options =>
+{ options.Filters.Add(typeof(ApiExceptionFilter)); 
+
+})
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+    });
 
 var app = builder.Build();
 
