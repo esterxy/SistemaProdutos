@@ -3,6 +3,7 @@ using SistemaProdutos.Context;
 using SistemaProdutos.Extensions;
 using SistemaProdutos.Filters;
 using SistemaProdutos.Logging;
+using SistemaProdutos.Repositories;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -20,6 +21,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 );
 
 builder.Services.AddScoped<ApiLoggingFilter>();
+builder.Services.AddScoped<ICategoriaRepository, CategoriaRepository>();
 
 // Configuração do Log
 builder.Logging.ClearProviders();
@@ -39,8 +41,8 @@ builder.Services.AddControllers(options =>
 
 var app = builder.Build();
 
-// Middleware - ORDEM IMPORTANTE
-app.ConfigureExceptionHandler(); // Coloque primeiro!
+// Middleware 
+app.ConfigureExceptionHandler(); 
 
 if (app.Environment.IsDevelopment())
 {

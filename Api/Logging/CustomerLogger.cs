@@ -37,12 +37,12 @@ namespace SistemaProdutos.Logging
 
         private void EscreverTextoNoArquivo(string mensagem)
         {
-            // Dica: Certifique-se de que este caminho existe e o app tem permissão de escrita
+            
             string caminhoArquivoLog = @"C:\Users\231.918058\Downloads\Ester.txt";
 
             try
             {
-                // Usar 'using' garante que o arquivo seja fechado corretamente
+                
                 using (StreamWriter streamWriter = new StreamWriter(caminhoArquivoLog, true, Encoding.UTF8))
                 {
                     streamWriter.WriteLine(mensagem);
@@ -50,7 +50,7 @@ namespace SistemaProdutos.Logging
             }
             catch (Exception ex)
             {
-                // Não damos 'throw' aqui para não travar a aplicação se o disco estiver cheio ou sem permissão
+                
                 Console.WriteLine($"FALHA NO LOGGER: {ex.Message}");
             }
         }
