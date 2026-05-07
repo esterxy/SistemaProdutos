@@ -34,7 +34,7 @@ namespace SistemaProdutos.Controllers
         }
 
         // GET: api/Produtos/5
-        [HttpGet("{id:int:min(1)}")]
+        [HttpGet("{id:int:min(1)}", Name = "ObterProduto")]
         public ActionResult <Produto> GetProduto(int id)
         {
             var produto = _repository.GetProduto(id);
