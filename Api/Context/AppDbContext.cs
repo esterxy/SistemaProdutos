@@ -1,5 +1,5 @@
-﻿using SistemaProdutos.Models;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using SistemaProdutos.Models;
 
 namespace SistemaProdutos.Context
 {

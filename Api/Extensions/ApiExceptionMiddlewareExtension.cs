@@ -1,11 +1,11 @@
-﻿using SistemaProdutos.Models;
-using Microsoft.AspNetCore.Diagnostics;
+﻿using Microsoft.AspNetCore.Diagnostics;
+using SistemaProdutos.Models;
 
 namespace SistemaProdutos.Extensions
 {
     public static class ApiExceptionMiddlewareExtension
     {
-        
+
         public static void ConfigureExceptionHandler(this IApplicationBuilder app)
         {
             app.UseExceptionHandler(appError =>
@@ -18,7 +18,7 @@ namespace SistemaProdutos.Extensions
                     var contextFeature = context.Features.Get<IExceptionHandlerFeature>();
                     if (contextFeature != null)
                     {
-                        
+
                         await context.Response.WriteAsync(new ErrorDetails()
                         {
                             StatusCode = context.Response.StatusCode,

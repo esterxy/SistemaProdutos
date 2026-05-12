@@ -13,10 +13,10 @@ namespace SistemaProdutos.Filters
         public void OnException(ExceptionContext context)
         {
             _logger.LogError(context.Exception, "Ocorreu um erro inesperado: Status Code 500");
-           
+
             context.Result = new ObjectResult("Ocorreu um problema ao tratar sua solicitação: Status Code 500")
             {
-               StatusCode = StatusCodes.Status500InternalServerError,
+                StatusCode = StatusCodes.Status500InternalServerError,
             };
         }
     }

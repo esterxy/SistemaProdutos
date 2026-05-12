@@ -8,14 +8,26 @@ namespace SistemaProdutos.Controllers
     [ApiController]
     public class ProdutosController : ControllerBase
     {
-        private readonly IProdutoRepository _repository;
+        private readonly IUnitOfWork _uof;
         private readonly ILogger _logger;
 
 
-        public ProdutosController(IProdutoRepository repository, ILogger<ProdutosController> logger)
+        public ProdutosController(IUnitOfWork uof, ILogger<ProdutosController> logger)
         {
-            _repository = repository;
+            _uof = uof;
             _logger = logger;
+        }
+
+        [HttpGet("produtos/{id}")]
+        public ActionResult<IEnumerable<Produto>> GetProdutosCategoria(int id)
+        {
+            var produto = _uof.ProdutoRepository.GetProdutosPorCategoria(id);
+
+            if (produto is null)
+            {
+                return NotFound();
+            }
+            return Ok(produto);
         }
 
         // GET: api/Produtos
@@ -24,7 +36,7 @@ namespace SistemaProdutos.Controllers
         {
             _logger.LogInformation($"=========================== Iniciando a execução do método GetProdutos ===========================");
 
-            var produto = _repository.GetProdutos().ToList();
+            var produto = _uof.ProdutoRepository.GetAll();
             if (produto is null)
             {
                 return NotFound();
@@ -35,9 +47,9 @@ namespace SistemaProdutos.Controllers
 
         // GET: api/Produtos/5
         [HttpGet("{id:int:min(1)}", Name = "ObterProduto")]
-        public ActionResult <Produto> GetProduto(int id)
+        public ActionResult<Produto> GetProduto(int id)
         {
-            var produto = _repository.GetProduto(id);
+            var produto = _uof.ProdutoRepository.Get(c => c.ProdutoId == id);
 
             if (produto == null)
             {
@@ -45,7 +57,7 @@ namespace SistemaProdutos.Controllers
                 return NotFound();
             }
             _logger.LogInformation($"=========================== Iniciando a execução do método GetProdutos {id} ===========================");
-            return Ok (produto);
+            return Ok(produto);
         }
 
         // PUT: api/Produtos/5
@@ -58,15 +70,11 @@ namespace SistemaProdutos.Controllers
                 return BadRequest();
             }
 
-            bool atualizado  = _repository.Update(produto);
-            if (atualizado)
-            {
-                return Ok(produto);
-            }
-            else
-            {
-                return StatusCode(500, $"Falha ao atualizar o produto de Id = {id}");
-            }
+            var produtoAtualizado = _uof.ProdutoRepository.Update(produto);
+            _uof.Commit();
+
+            return Ok(produtoAtualizado);
+
         }
 
         // POST: api/Produtos
@@ -78,7 +86,8 @@ namespace SistemaProdutos.Controllers
             {
                 return BadRequest();
             }
-             var novoProduto = _repository.Create(produto);
+            var novoProduto = _uof.ProdutoRepository.Update(produto);
+            _uof.Commit();
 
             return new CreatedAtRouteResult("ObterProduto", new { id = novoProduto.ProdutoId }, novoProduto);
         }
@@ -87,20 +96,20 @@ namespace SistemaProdutos.Controllers
         [HttpDelete("{id}")]
         public IActionResult DeleteProduto(int id)
         {
-            bool deletado = _repository.Delete(id);
-            if (deletado)
+            var produto = _uof.ProdutoRepository.Get(c => c.ProdutoId == id);
+            if (produto is null)
             {
-                return Ok($"Produto de id = {id} foi excluido");
+                return NotFound();
             }
-            else
-            {
-                return StatusCode(500, $" Falha ao excluir produto de id={id}");
-            }
+            var produtoDeletado = _uof.ProdutoRepository.Delete(produto);
+            _uof.Commit();
+            return Ok(produtoDeletado);
 
-            
-            
+
+
+
         }
 
-       
+
     }
 }

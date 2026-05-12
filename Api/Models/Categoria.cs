@@ -28,5 +28,5 @@ namespace SistemaProdutos.Models
         public ICollection<Produto>? Produtos { get; set; }
     }
 
-    
+
 }

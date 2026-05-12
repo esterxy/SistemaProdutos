@@ -37,12 +37,12 @@ namespace SistemaProdutos.Logging
 
         private void EscreverTextoNoArquivo(string mensagem)
         {
-            
+
             string caminhoArquivoLog = @"C:\Users\231.918058\Downloads\Ester.txt";
 
             try
             {
-                
+
                 using (StreamWriter streamWriter = new StreamWriter(caminhoArquivoLog, true, Encoding.UTF8))
                 {
                     streamWriter.WriteLine(mensagem);
@@ -50,7 +50,7 @@ namespace SistemaProdutos.Logging
             }
             catch (Exception ex)
             {
-                
+
                 Console.WriteLine($"FALHA NO LOGGER: {ex.Message}");
             }
         }

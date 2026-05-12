@@ -1,5 +1,4 @@
 ﻿using System.Collections.Concurrent;
-using Microsoft.Extensions.Logging;
 
 namespace SistemaProdutos.Logging
 {
@@ -19,7 +18,7 @@ namespace SistemaProdutos.Logging
             return loggers.GetOrAdd(categoryName, name => new CustomerLogger(name, loggerConfig));
         }
 
-       
+
         public void Dispose()
         {
             loggers.Clear();

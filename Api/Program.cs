@@ -23,6 +23,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddScoped<ApiLoggingFilter>();
 builder.Services.AddScoped<ICategoriaRepository, CategoriaRepository>();
 builder.Services.AddScoped<IProdutoRepository, ProdutoRepository>();
+builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 // Configuração do Log
 builder.Logging.ClearProviders();
@@ -32,7 +34,8 @@ builder.Logging.AddProvider(new CustomerLoggerProvider(new CustomerLoggerProvide
     LogLevel = LogLevel.Information
 }));
 builder.Services.AddControllers(options =>
-{ options.Filters.Add(typeof(ApiExceptionFilter)); 
+{
+    options.Filters.Add(typeof(ApiExceptionFilter));
 
 })
     .AddJsonOptions(options =>
@@ -43,7 +46,7 @@ builder.Services.AddControllers(options =>
 var app = builder.Build();
 
 // Middleware 
-app.ConfigureExceptionHandler(); 
+app.ConfigureExceptionHandler();
 
 if (app.Environment.IsDevelopment())
 {
