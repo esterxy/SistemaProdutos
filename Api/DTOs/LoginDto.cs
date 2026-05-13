@@ -3,12 +3,25 @@ using System.ComponentModel.DataAnnotations;
 namespace SistemaProdutos.DTOs
 {
     /// <summary>
-    /// DTO de entrada para autenticação.
+    /// DTO de entrada para autenticação (admin mockado).
     /// </summary>
     public class LoginDto
     {
         [Required(ErrorMessage = "O usuário é obrigatório.")]
         public string Usuario { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "A senha é obrigatória.")]
+        public string Senha { get; set; } = string.Empty;
+    }
+
+    /// <summary>
+    /// DTO de entrada para login de clientes cadastrados (via email).
+    /// </summary>
+    public class LoginEmailDto
+    {
+        [Required(ErrorMessage = "O email é obrigatório.")]
+        [EmailAddress(ErrorMessage = "Email inválido.")]
+        public string Email { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "A senha é obrigatória.")]
         public string Senha { get; set; } = string.Empty;
@@ -24,3 +37,4 @@ namespace SistemaProdutos.DTOs
         public string Usuario { get; set; } = string.Empty;
     }
 }
+

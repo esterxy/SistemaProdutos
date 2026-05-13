@@ -13,5 +13,16 @@ namespace SistemaProdutos.Repositories
         /// Busca todos os pedidos com eager loading dos itens e produtos.
         /// </summary>
         IEnumerable<Pedido> GetTodosComItens();
+
+        /// <summary>
+        /// Busca pedidos de um cliente específico.
+        /// </summary>
+        IEnumerable<Pedido> GetPedidosPorCliente(int clienteId);
+
+        /// <summary>
+        /// Busca pedidos filtrados por categoria (via itens→produto→categoriaId).
+        /// Se clienteId for null, retorna de todos os clientes.
+        /// </summary>
+        IEnumerable<Pedido> GetPedidosFiltrados(int? clienteId, int? categoriaId);
     }
 }

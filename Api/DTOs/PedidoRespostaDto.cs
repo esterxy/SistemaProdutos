@@ -10,6 +10,7 @@ namespace SistemaProdutos.DTOs
         public DateTime DataPedido { get; set; }
         public string Status { get; set; } = string.Empty;
         public decimal ValorTotal { get; set; }
+        public string? QrCodeBase64 { get; set; }
         public List<ItemPedidoRespostaDto> Itens { get; set; } = new();
     }
 

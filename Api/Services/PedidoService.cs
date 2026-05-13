@@ -1,19 +1,10 @@
+using QRCoder;
 using SistemaProdutos.DTOs;
 using SistemaProdutos.Models;
 using SistemaProdutos.Repositories;
 
 namespace SistemaProdutos.Services
 {
-    /// <summary>
-    /// Serviço de pedidos — contém toda a regra de negócio para criação e consulta de pedidos.
-    /// Responsabilidades:
-    /// - Validar dados de entrada
-    /// - Buscar produtos no banco para obter preços reais
-    /// - Verificar estoque disponível
-    /// - Calcular subtotais e valor total
-    /// - Persistir pedido e itens via UnitOfWork
-    /// - Mapear entidades para DTOs de resposta
-    /// </summary>
     public class PedidoService : IPedidoService
     {
         private readonly IUnitOfWork _uof;
@@ -25,129 +16,128 @@ namespace SistemaProdutos.Services
             _logger = logger;
         }
 
-        /// <summary>
-        /// Cria um novo pedido a partir do DTO.
-        /// 
-        /// Fluxo:
-        /// 1. Valida se há itens no pedido
-        /// 2. Para cada item, busca o produto no banco
-        /// 3. Valida existência do produto e estoque suficiente
-        /// 4. Calcula preço unitário × quantidade
-        /// 5. Soma todos os subtotais para o valor total
-        /// 6. Desconta o estoque
-        /// 7. Salva tudo atomicamente via UnitOfWork
-        /// </summary>
-        public async Task<PedidoRespostaDto> CriarPedidoAsync(CriarPedidoDto dto)
+        public async Task<PedidoRespostaDto> CriarPedidoAsync(CriarPedidoDto dto, int? clienteId)
         {
-            _logger.LogInformation("Iniciando criação de pedido para o cliente: {Cliente}", dto.NomeCliente);
+            _logger.LogInformation("Criando pedido para: {Cliente} (ClienteId={Id})", dto.NomeCliente, clienteId);
 
-            // Validação de entrada
             if (dto.Itens == null || dto.Itens.Count == 0)
-            {
                 throw new ArgumentException("O pedido deve conter pelo menos um item.");
-            }
 
             var pedido = new Pedido
             {
                 NomeCliente = dto.NomeCliente,
                 DataPedido = DateTime.Now,
-                Status = "Pendente"
+                Status = "Pendente",
+                ClienteId = clienteId
             };
 
             decimal valorTotal = 0;
 
             foreach (var itemDto in dto.Itens)
             {
-                // Busca o produto no banco — preço vem de lá, nunca do cliente
                 var produto = _uof.ProdutoRepository.Get(p => p.ProdutoId == itemDto.ProdutoId);
 
                 if (produto == null)
-                {
-                    throw new KeyNotFoundException(
-                        $"Produto com ID {itemDto.ProdutoId} não encontrado.");
-                }
+                    throw new KeyNotFoundException($"Produto com ID {itemDto.ProdutoId} não encontrado.");
 
-                // Validação de estoque
                 if (produto.Estoque < itemDto.Quantidade)
-                {
                     throw new InvalidOperationException(
-                        $"Estoque insuficiente para o produto '{produto.Nome}'. " +
-                        $"Disponível: {produto.Estoque}, Solicitado: {itemDto.Quantidade}.");
-                }
+                        $"Estoque insuficiente para '{produto.Nome}'. Disponível: {produto.Estoque}, Solicitado: {itemDto.Quantidade}.");
 
-                // Cálculo do subtotal com preço buscado do banco
                 decimal subTotal = produto.Preco * itemDto.Quantidade;
 
-                var itemPedido = new ItemPedido
+                pedido.Itens.Add(new ItemPedido
                 {
                     ProdutoId = itemDto.ProdutoId,
                     Quantidade = itemDto.Quantidade,
                     PrecoUnitario = produto.Preco,
                     SubTotal = subTotal
-                };
+                });
 
-                pedido.Itens.Add(itemPedido);
                 valorTotal += subTotal;
-
-                // Desconta estoque
                 produto.Estoque -= itemDto.Quantidade;
                 _uof.ProdutoRepository.Update(produto);
 
-                _logger.LogInformation(
-                    "Item adicionado: {Produto} x{Qtd} = R${SubTotal:F2}",
-                    produto.Nome, itemDto.Quantidade, subTotal);
+                _logger.LogInformation("Item: {Produto} x{Qtd} = R${Sub:F2}", produto.Nome, itemDto.Quantidade, subTotal);
             }
 
             pedido.ValorTotal = valorTotal;
+            pedido.QrCodeBase64 = GerarQrCodePix(pedido.NomeCliente, valorTotal);
 
-            // Persiste pedido + itens atomicamente
             _uof.PedidoRepository.Create(pedido);
             await _uof.CommitAsync();
 
-            _logger.LogInformation(
-                "Pedido #{PedidoId} criado com sucesso. Total: R${Total:F2}",
-                pedido.PedidoId, valorTotal);
-
-            // Retorna DTO com dados completos (recarrega com Include)
+            _logger.LogInformation("Pedido #{Id} criado. Total: R${Total:F2}", pedido.PedidoId, valorTotal);
             return MapearParaDto(pedido);
         }
 
-        /// <summary>
-        /// Busca um pedido por ID com eager loading dos itens e produtos.
-        /// </summary>
-        public Task<PedidoRespostaDto?> ObterPedidoAsync(int id)
+        public async Task<bool> CancelarPedidoAsync(int id, int? clienteId)
         {
-            _logger.LogInformation("Buscando pedido #{PedidoId}", id);
+            _logger.LogInformation("Cancelando pedido #{Id} (clienteId={CId})", id, clienteId);
 
             var pedido = _uof.PedidoRepository.GetPedidoComItens(id);
+            if (pedido == null) return false;
 
-            if (pedido == null)
+            // Já cancelado?
+            if (pedido.Status.StartsWith("Cancelado"))
             {
-                _logger.LogWarning("Pedido #{PedidoId} não encontrado.", id);
-                return Task.FromResult<PedidoRespostaDto?>(null);
+                _logger.LogWarning("Pedido #{Id} já está cancelado.", id);
+                return false;
             }
 
-            return Task.FromResult<PedidoRespostaDto?>(MapearParaDto(pedido));
+            // Se for cliente, valida que o pedido é dele
+            if (clienteId.HasValue && pedido.ClienteId != clienteId.Value)
+            {
+                _logger.LogWarning("Cliente {CId} tentou cancelar pedido #{Id} de outro cliente.", clienteId, id);
+                return false;
+            }
+
+            // Restaura estoque
+            foreach (var item in pedido.Itens)
+            {
+                var produto = _uof.ProdutoRepository.Get(p => p.ProdutoId == item.ProdutoId);
+                if (produto != null)
+                {
+                    produto.Estoque += item.Quantidade;
+                    _uof.ProdutoRepository.Update(produto);
+                }
+            }
+
+            // Define status de acordo com quem cancelou
+            pedido.Status = clienteId.HasValue ? "Cancelado pelo cliente" : "Cancelado pela loja";
+            _uof.PedidoRepository.Update(pedido);
+            await _uof.CommitAsync();
+
+            _logger.LogInformation("Pedido #{Id} → {Status}", id, pedido.Status);
+            return true;
         }
 
-        /// <summary>
-        /// Lista todos os pedidos com eager loading.
-        /// </summary>
-        public Task<IEnumerable<PedidoRespostaDto>> ObterTodosPedidosAsync()
+        public Task<PedidoRespostaDto?> ObterPedidoAsync(int id)
         {
-            _logger.LogInformation("Listando todos os pedidos.");
+            var pedido = _uof.PedidoRepository.GetPedidoComItens(id);
+            return Task.FromResult(pedido == null ? null : (PedidoRespostaDto?)MapearParaDto(pedido));
+        }
 
-            var pedidos = _uof.PedidoRepository.GetTodosComItens();
+        public Task<IEnumerable<PedidoRespostaDto>> ObterPedidosFiltradosAsync(int? clienteId, int? categoriaId)
+        {
+            _logger.LogInformation("Listando pedidos (clienteId={CId}, categoriaId={Cat})", clienteId, categoriaId);
 
+            var pedidos = _uof.PedidoRepository.GetPedidosFiltrados(clienteId, categoriaId);
             var resultado = pedidos.Select(MapearParaDto);
-
             return Task.FromResult(resultado);
         }
 
-        /// <summary>
-        /// Mapeia uma entidade Pedido para o DTO de resposta.
-        /// Centraliza a conversão para manter o DRY.
-        /// </summary>
+        private static string GerarQrCodePix(string nomeCliente, decimal valor)
+        {
+            var valorFmt = valor.ToString("F2", System.Globalization.CultureInfo.InvariantCulture);
+            var payload = $"00020126580014BR.GOV.BCB.PIX0136saborbrasa@pix.com.br520400005303986540{valorFmt}5802BR5913Sabor e Brasa6008Sao Paulo62070503***6304";
+
+            using var qrGen = new QRCodeGenerator();
+            var data = qrGen.CreateQrCode(payload, QRCodeGenerator.ECCLevel.M);
+            using var qrCode = new PngByteQRCode(data);
+            return Convert.ToBase64String(qrCode.GetGraphic(8));
+        }
+
         private static PedidoRespostaDto MapearParaDto(Pedido pedido)
         {
             return new PedidoRespostaDto
@@ -157,6 +147,7 @@ namespace SistemaProdutos.Services
                 DataPedido = pedido.DataPedido,
                 Status = pedido.Status,
                 ValorTotal = pedido.ValorTotal,
+                QrCodeBase64 = pedido.QrCodeBase64,
                 Itens = pedido.Itens.Select(item => new ItemPedidoRespostaDto
                 {
                     ItemPedidoId = item.ItemPedidoId,

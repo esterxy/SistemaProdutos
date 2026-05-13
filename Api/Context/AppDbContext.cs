@@ -14,6 +14,7 @@ namespace SistemaProdutos.Context
         public DbSet<Produto> Produtos { get; set; }
         public DbSet<Pedido> Pedidos { get; set; }
         public DbSet<ItemPedido> ItensPedido { get; set; }
+        public DbSet<Cliente> Clientes { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -48,6 +49,17 @@ namespace SistemaProdutos.Context
                     .WithMany()
                     .HasForeignKey(i => i.ProdutoId)
                     .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // Configuração do Cliente — email único
+            modelBuilder.Entity<Cliente>(entity =>
+            {
+                entity.HasKey(c => c.ClienteId);
+                entity.HasIndex(c => c.Email).IsUnique();
+                entity.HasMany<Pedido>()
+                    .WithOne(p => p.Cliente)
+                    .HasForeignKey(p => p.ClienteId)
+                    .OnDelete(DeleteBehavior.SetNull);
             });
         }
     }

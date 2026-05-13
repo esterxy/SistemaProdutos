@@ -2,25 +2,25 @@ using SistemaProdutos.DTOs;
 
 namespace SistemaProdutos.Services
 {
-    /// <summary>
-    /// Interface do serviço de pedidos — define o contrato da camada de negócios.
-    /// </summary>
     public interface IPedidoService
     {
         /// <summary>
-        /// Cria um novo pedido validando itens, calculando preços a partir do banco,
-        /// verificando estoque, e persistindo a entidade completa.
+        /// Cria um novo pedido. clienteId é null para admin.
         /// </summary>
-        Task<PedidoRespostaDto> CriarPedidoAsync(CriarPedidoDto dto);
+        Task<PedidoRespostaDto> CriarPedidoAsync(CriarPedidoDto dto, int? clienteId);
 
-        /// <summary>
-        /// Busca um pedido específico com todos os itens detalhados.
-        /// </summary>
         Task<PedidoRespostaDto?> ObterPedidoAsync(int id);
 
         /// <summary>
-        /// Lista todos os pedidos ordenados por data decrescente.
+        /// Lista pedidos filtrados. clienteId=null → todos (admin).
+        /// categoriaId filtra por categoria dos produtos.
         /// </summary>
-        Task<IEnumerable<PedidoRespostaDto>> ObterTodosPedidosAsync();
+        Task<IEnumerable<PedidoRespostaDto>> ObterPedidosFiltradosAsync(int? clienteId, int? categoriaId);
+
+        /// <summary>
+        /// Cancela um pedido e restaura estoque.
+        /// Se clienteId não for null, valida que o pedido pertence ao cliente.
+        /// </summary>
+        Task<bool> CancelarPedidoAsync(int id, int? clienteId);
     }
 }

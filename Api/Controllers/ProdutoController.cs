@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SistemaProdutos.DTOs;
 using SistemaProdutos.Models;
 using SistemaProdutos.Repositories;
 
@@ -122,6 +123,24 @@ namespace SistemaProdutos.Controllers
 
         }
 
+        /// <summary>
+        /// PATCH /api/Produtos/{id}/estoque — Atualiza apenas o estoque (Admin only).
+        /// Body: { "estoque": 50 }
+        /// </summary>
+        [HttpPatch("{id:int}/estoque")]
+        [Authorize(Roles = "Admin")]
+        public IActionResult AtualizarEstoque(int id, [FromBody] AtualizarEstoqueDto dto)
+        {
+            var produto = _uof.ProdutoRepository.Get(p => p.ProdutoId == id);
+            if (produto == null) return NotFound(new { message = "Produto não encontrado." });
+
+            produto.Estoque = dto.Estoque;
+            _uof.ProdutoRepository.Update(produto);
+            _uof.Commit();
+
+            _logger.LogInformation("Estoque do produto '{Nome}' atualizado para {Estoque}", produto.Nome, dto.Estoque);
+            return Ok(new { message = $"Estoque de '{produto.Nome}' atualizado para {dto.Estoque} unidades.", produto });
+        }
 
     }
 }

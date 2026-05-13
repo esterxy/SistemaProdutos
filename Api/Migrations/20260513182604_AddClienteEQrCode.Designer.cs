@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SistemaProdutos.Context;
 
@@ -10,9 +11,11 @@ using SistemaProdutos.Context;
 namespace SistemaProdutos.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260513182604_AddClienteEQrCode")]
+    partial class AddClienteEQrCode
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -108,9 +111,6 @@ namespace SistemaProdutos.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<int?>("ClienteId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("DataPedido")
                         .HasColumnType("datetime(6)");
 
@@ -131,8 +131,6 @@ namespace SistemaProdutos.Migrations
                         .HasColumnType("decimal(10,2)");
 
                     b.HasKey("PedidoId");
-
-                    b.HasIndex("ClienteId");
 
                     b.ToTable("Pedidos");
                 });
@@ -194,16 +192,6 @@ namespace SistemaProdutos.Migrations
                     b.Navigation("Pedido");
 
                     b.Navigation("Produto");
-                });
-
-            modelBuilder.Entity("SistemaProdutos.Models.Pedido", b =>
-                {
-                    b.HasOne("SistemaProdutos.Models.Cliente", "Cliente")
-                        .WithMany()
-                        .HasForeignKey("ClienteId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
-                    b.Navigation("Cliente");
                 });
 
             modelBuilder.Entity("SistemaProdutos.Models.Produto", b =>

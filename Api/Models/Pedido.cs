@@ -27,6 +27,17 @@ namespace SistemaProdutos.Models
         [StringLength(30)]
         public string Status { get; set; } = "Pendente";
 
+        /// <summary>
+        /// QR Code Pix em Base64 (PNG) gerado automaticamente ao criar o pedido.
+        /// </summary>
+        public string? QrCodeBase64 { get; set; }
+
+        /// <summary>
+        /// FK para o cliente que fez o pedido. Null se criado pelo admin.
+        /// </summary>
+        public int? ClienteId { get; set; }
+        public Cliente? Cliente { get; set; }
+
         public ICollection<ItemPedido> Itens { get; set; }
     }
 }
