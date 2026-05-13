@@ -94,7 +94,7 @@ function mostrarApp() {
 // ============================================
 async function carregarProdutos() {
     try {
-        const response = await fetch(`${API_BASE}/Produtos`, {
+        const response = await fetch(`${API_BASE}/api/Produtos`, {
             headers: {
                 'Authorization': `Bearer ${authToken}`
             }

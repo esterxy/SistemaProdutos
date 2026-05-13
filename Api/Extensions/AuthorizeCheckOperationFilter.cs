@@ -15,16 +15,9 @@ namespace SistemaProdutos.Extensions
 
             if (hasAuthorize && !allowAnonymous)
             {
-                operation.Responses.Add("401", new OpenApiResponse { Description = "Unauthorized" });
-                operation.Responses.Add("403", new OpenApiResponse { Description = "Forbidden" });
-
-                operation.Security = new List<OpenApiSecurityRequirement>
-                {
-                    new OpenApiSecurityRequirement
-                    {
-                        [new OpenApiSecuritySchemeReference("Bearer")] = new List<string>()
-                    }
-                };
+                operation.Responses.TryAdd("401", new OpenApiResponse { Description = "Unauthorized" });
+                operation.Responses.TryAdd("403", new OpenApiResponse { Description = "Forbidden" });
+                // Requisito Bearer: ver SecurityRequirementsDocumentFilter (OpenApiSecuritySchemeReference precisa do documento).
             }
         }
     }

@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using SistemaProdutos.DTOs;
@@ -33,6 +34,7 @@ namespace SistemaProdutos.Controllers
         /// Body: { "usuario": "admin", "senha": "admin123" }
         /// </summary>
         [HttpPost("login")]
+        [AllowAnonymous]
         public ActionResult<LoginRespostaDto> Login([FromBody] LoginDto loginDto)
         {
             // Validação do ModelState (Data Annotations)

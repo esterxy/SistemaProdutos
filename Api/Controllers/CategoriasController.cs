@@ -5,7 +5,7 @@ using SistemaProdutos.Repositories;
 
 namespace SistemaProdutos.Controllers;
 
-[Route("[controller]")]
+[Route("api/[controller]")]
 [ApiController]
 [Authorize]
 public class CategoriasController : ControllerBase
