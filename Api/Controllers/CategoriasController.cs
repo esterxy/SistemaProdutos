@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SistemaProdutos.Models;
 using SistemaProdutos.Repositories;
@@ -6,6 +7,7 @@ namespace SistemaProdutos.Controllers;
 
 [Route("[controller]")]
 [ApiController]
+[Authorize]
 public class CategoriasController : ControllerBase
 {
     private readonly IUnitOfWork _uof;

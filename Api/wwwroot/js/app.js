@@ -94,7 +94,11 @@ function mostrarApp() {
 // ============================================
 async function carregarProdutos() {
     try {
-        const response = await fetch(`${API_BASE}/Produtos`);
+        const response = await fetch(`${API_BASE}/Produtos`, {
+            headers: {
+                'Authorization': `Bearer ${authToken}`
+            }
+        });
         if (!response.ok) throw new Error('Erro ao carregar');
         produtos = await response.json();
         renderizarProdutos();
