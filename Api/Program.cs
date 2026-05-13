@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.OpenApi;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -31,7 +32,11 @@ builder.Services.AddAuthorization(options =>
 
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Sistema Produtos API", Version = "v1" });
+    c.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "Sistema Produtos API",
+        Version = "v1"
+    });
 
     // JWT no Swagger (tipo Http alinha melhor com o Bearer do JwtBearer)
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
@@ -41,7 +46,7 @@ builder.Services.AddSwaggerGen(c =>
         Scheme = "bearer",
         BearerFormat = "JWT",
         In = ParameterLocation.Header,
-        Description = "JWT no header Authorization. Ex.: Bearer {seu_token}"
+        Description = "Obtenha o token em POST /api/Auth/login. Cole somente o JWT (sem o prefixo Bearer)."
     });
 
     c.OperationFilter<AuthorizeCheckOperationFilter>();
@@ -89,6 +94,33 @@ builder.Services.AddAuthentication(options =>
         IssuerSigningKey = new SymmetricSecurityKey(key),
         ClockSkew = TimeSpan.Zero // Remove a tolerância padrão de 5 min
     };
+
+    // Resposta JSON clara em 401 (Swagger/SPA), em vez de só o header WWW-Authenticate.
+    options.Events = new JwtBearerEvents
+    {
+        OnChallenge = async context =>
+        {
+            context.HandleResponse();
+            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+            context.Response.ContentType = "application/json; charset=utf-8";
+
+            var ex = context.AuthenticateFailure;
+            // Ordem importa: tipos mais derivados antes de SecurityTokenException.
+            string message =
+                ex is SecurityTokenExpiredException ? "Token JWT expirado. Faça login novamente." :
+                ex is SecurityTokenMalformedException ? "Token JWT malformado." :
+                ex is SecurityTokenInvalidAudienceException ? "Token JWT com audiência inválida." :
+                ex is SecurityTokenInvalidIssuerException ? "Token JWT com emissor inválido." :
+                ex is SecurityTokenInvalidSignatureException ? "Token JWT inválido (assinatura incorreta ou chave não reconhecida)." :
+                ex is SecurityTokenException ? "Token JWT inválido." :
+                ex is not null ? "Falha na autenticação do token JWT." :
+                string.IsNullOrWhiteSpace(context.Request.Headers.Authorization)
+                    ? "É necessário enviar o header Authorization: Bearer {token}."
+                    : (context.ErrorDescription ?? context.Error ?? "Acesso não autorizado.");
+
+            await context.Response.WriteAsJsonAsync(new { message });
+        }
+    };
 });
 
 // =============================================
@@ -130,13 +162,29 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Sistema Produtos API v1");
+        c.DocumentTitle = "Sistema Produtos API — documentação";
+        // Valida o JWT com a API antes de marcar como “autorizado” (comportamento padrão do Swagger UI não valida).
+        c.InjectJavascript("/swagger-ui/validate-bearer.js");
+    });
 }
 
 app.UseHttpsRedirection();
 
-// Arquivos estáticos (wwwroot — frontend)
-app.UseStaticFiles();
+// Arquivos estáticos (wwwroot — frontend). Em desenvolvimento evita cache agressivo do app.js.
+var staticFiles = new StaticFileOptions();
+if (app.Environment.IsDevelopment())
+{
+    staticFiles.OnPrepareResponse = ctx =>
+    {
+        ctx.Context.Response.Headers["Cache-Control"] = "no-cache, no-store, must-revalidate";
+        ctx.Context.Response.Headers["Pragma"] = "no-cache";
+        ctx.Context.Response.Headers["Expires"] = "0";
+    };
+}
+app.UseStaticFiles(staticFiles);
 
 // CORS
 app.UseCors("PermitirFrontend");

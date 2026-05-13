@@ -2,7 +2,13 @@
 // ESTADO GLOBAL
 // ============================================
 const API_BASE = window.location.origin;
-let authToken = localStorage.getItem('jwt') || '';
+
+function obterJwtDoArmazenamento() {
+    const bruto = localStorage.getItem('jwt');
+    return bruto && bruto.trim() ? bruto.trim() : '';
+}
+
+let authToken = obterJwtDoArmazenamento();
 let carrinho = [];
 let produtos = [];
 
@@ -32,11 +38,80 @@ const FOOD_IMAGES = {
 // ============================================
 // INICIALIZAÇÃO
 // ============================================
-window.addEventListener('DOMContentLoaded', () => {
+window.addEventListener('DOMContentLoaded', async () => {
     if (authToken) {
-        mostrarApp();
+        const valido = await validarTokenArmazenado();
+        if (valido) {
+            mostrarApp();
+        }
     }
 });
+
+/** Lê { message } de respostas JSON da API (ex.: 401 JWT). */
+async function lerMensagemErroApi(response) {
+    try {
+        const data = await response.clone().json();
+        if (data && typeof data.message === 'string') {
+            return data.message;
+        }
+    } catch {
+        /* corpo não JSON */
+    }
+    return null;
+}
+
+/** Encerra UI “logada” e exige login de novo (token inválido/expirado). */
+function encerrarSessaoPorTokenInvalido(mensagemPadrao) {
+    authToken = '';
+    localStorage.removeItem('jwt');
+    localStorage.removeItem('jwt_user');
+    const appEl = document.getElementById('app');
+    const overlayEl = document.getElementById('loginOverlay');
+    if (appEl) {
+        appEl.style.display = 'none';
+    }
+    if (overlayEl) {
+        overlayEl.style.display = 'flex';
+    }
+    const errorEl = document.getElementById('loginError');
+    if (errorEl) {
+        errorEl.textContent = mensagemPadrao;
+        errorEl.style.display = 'block';
+    }
+}
+
+/** Valida o JWT salvo com a API antes de abrir o sistema (evita “logado” com token lixo). */
+async function validarTokenArmazenado() {
+    authToken = obterJwtDoArmazenamento();
+    if (!authToken) {
+        return false;
+    }
+    try {
+        const response = await fetch(`${API_BASE}/api/Produtos`, {
+            headers: { Authorization: `Bearer ${authToken}` }
+        });
+        if (response.status === 401) {
+            const msg =
+                (await lerMensagemErroApi(response)) ||
+                'Token inválido ou expirado. Faça login novamente.';
+            encerrarSessaoPorTokenInvalido(msg);
+            return false;
+        }
+        if (!response.ok) {
+            encerrarSessaoPorTokenInvalido('Não foi possível validar a sessão. Faça login novamente.');
+            return false;
+        }
+        try {
+            await response.json();
+        } catch {
+            /* ignora corpo */
+        }
+        return true;
+    } catch {
+        encerrarSessaoPorTokenInvalido('Erro de conexão ao validar o token.');
+        return false;
+    }
+}
 
 // ============================================
 // AUTENTICAÇÃO
@@ -62,7 +137,12 @@ async function fazerLogin() {
         }
 
         const data = await response.json();
-        authToken = data.token;
+        authToken = (data.token || '').trim();
+        if (!authToken) {
+            errorEl.textContent = 'Resposta de login sem token.';
+            errorEl.style.display = 'block';
+            return;
+        }
         localStorage.setItem('jwt', authToken);
         localStorage.setItem('jwt_user', data.usuario);
         mostrarApp();
@@ -81,10 +161,16 @@ function logout() {
 }
 
 function mostrarApp() {
+    authToken = obterJwtDoArmazenamento();
+    if (!authToken) {
+        document.getElementById('loginOverlay').style.display = 'flex';
+        document.getElementById('app').style.display = 'none';
+        return;
+    }
     document.getElementById('loginOverlay').style.display = 'none';
     document.getElementById('app').style.display = 'block';
-    document.getElementById('userBadge').textContent =
-        localStorage.getItem('jwt_user') || 'admin';
+    const nome = (localStorage.getItem('jwt_user') || '').trim();
+    document.getElementById('userBadge').textContent = nome || '—';
     carregarProdutos();
     carregarPedidos();
 }
@@ -99,6 +185,14 @@ async function carregarProdutos() {
                 'Authorization': `Bearer ${authToken}`
             }
         });
+        if (response.status === 401) {
+            const msg =
+                (await lerMensagemErroApi(response)) ||
+                'Token inválido ou expirado. Faça login novamente.';
+            mostrarToast(msg, 'error');
+            encerrarSessaoPorTokenInvalido(msg);
+            return;
+        }
         if (!response.ok) throw new Error('Erro ao carregar');
         produtos = await response.json();
         renderizarProdutos();
@@ -281,8 +375,11 @@ async function finalizarPedido() {
         });
 
         if (response.status === 401) {
-            mostrarToast('Sessão expirada! Faça login novamente.', 'error');
-            logout();
+            const msg =
+                (await lerMensagemErroApi(response)) ||
+                'Sessão expirada ou token inválido. Faça login novamente.';
+            mostrarToast(msg, 'error');
+            encerrarSessaoPorTokenInvalido(msg);
             return;
         }
 
@@ -313,6 +410,14 @@ async function carregarPedidos() {
         const response = await fetch(`${API_BASE}/api/Pedido`, {
             headers: { 'Authorization': `Bearer ${authToken}` }
         });
+        if (response.status === 401) {
+            const msg =
+                (await lerMensagemErroApi(response)) ||
+                'Token inválido ou expirado. Faça login novamente.';
+            mostrarToast(msg, 'error');
+            encerrarSessaoPorTokenInvalido(msg);
+            return;
+        }
         if (!response.ok) return;
         const pedidos = await response.json();
         renderizarPedidos(pedidos);
