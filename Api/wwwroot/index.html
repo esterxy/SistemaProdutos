@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Sabor e Brasa - Hambúrgueres artesanais feitos com ingredientes frescos e selecionados. Peça agora!">
+<title>Sabor e Brasa | Hambúrgueres Artesanais</title>
+<link rel="icon" href="/img/logo.png" type="image/png">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/landing.css">
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="nav">
+  <div class="container">
+    <a href="#inicio" class="nav-brand">
+      <img src="/img/logo.png" alt="Sabor e Brasa">
+      <span>Sabor e Brasa</span>
+    </a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="#inicio" class="active">Início</a></li>
+      <li><a href="#menu">Menu</a></li>
+      <li><a href="#sobre">Sobre</a></li>
+      <li><a href="#avaliacoes">Avaliações</a></li>
+      <li><a href="/pedidos.html">Sistema</a></li>
+    </ul>
+    <div style="display:flex;align-items:center;gap:16px">
+      <a href="/pedidos.html" class="btn btn-accent">Peça Agora</a>
+      <div class="hamburger" id="hamburger"><span></span><span></span><span></span></div>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="inicio">
+  <div class="container">
+    <div class="hero-content">
+      <span class="badge">Hambúrgueres Artesanais</span>
+      <h1>Sabor Autêntico,<br><span class="accent">Qualidade Excepcional</span></h1>
+      <p class="subtitle">Cada hambúrguer é uma obra-prima. Ingredientes frescos, selecionados diariamente, preparados com a paixão que só a brasa pode dar.</p>
+      <div class="hero-btns">
+        <a href="#menu" class="btn btn-accent">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+          Ver Cardápio
+        </a>
+        <a href="/pedidos.html" class="btn btn-outline">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+          Peça Online
+        </a>
+      </div>
+      <div class="hero-stats">
+        <div class="stat">
+          <div class="stat-val" data-val="500" data-suffix="+">0</div>
+          <div class="stat-label">Clientes Satisfeitos</div>
+        </div>
+        <div class="stat">
+          <div class="stat-val" data-val="4.9">0</div>
+          <div class="stat-label">Avaliação Média</div>
+        </div>
+        <div class="stat">
+          <div class="stat-val" data-val="100" data-suffix="%">0</div>
+          <div class="stat-label">Ingredientes Frescos</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SOBRE NÓS -->
+<section id="sobre" style="background:var(--bg2)">
+  <div class="container">
+    <div class="about-grid">
+      <div class="about-img">
+        <img src="https://images.unsplash.com/photo-1550547660-d9450f859349?w=600&h=600&fit=crop" alt="Hambúrguer artesanal" loading="lazy">
+      </div>
+      <div>
+        <span class="section-badge">SOBRE NÓS</span>
+        <h2 class="section-title">Paixão por Hambúrgueres desde 2020</h2>
+        <p class="section-desc">Nascemos da vontade de criar algo especial. Cada receita é desenvolvida com carinho, usando ingredientes de produtores locais e técnicas artesanais que fazem toda a diferença.</p>
+        <ul class="about-list">
+          <li><span class="check">✓</span> Carnes 100% Angus selecionadas</li>
+          <li><span class="check">✓</span> Pães artesanais feitos diariamente</li>
+          <li><span class="check">✓</span> Molhos exclusivos da casa</li>
+          <li><span class="check">✓</span> Ingredientes orgânicos e frescos</li>
+          <li><span class="check">✓</span> Delivery rápido e seguro</li>
+        </ul>
+        <div class="quote-card">
+          <p>"Acreditamos que um bom hambúrguer tem o poder de transformar um dia comum em um momento especial. É isso que buscamos entregar, sempre."</p>
+          <span class="author">— Equipe Sabor e Brasa</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MENU -->
+<section id="menu">
+  <div class="container">
+    <div class="text-center">
+      <span class="section-badge">NOSSO CARDÁPIO</span>
+      <h2 class="section-title">Sabores Irresistíveis</h2>
+      <p class="section-desc mx-auto">Descubra nossos hambúrgueres premiados, acompanhamentos crocantes e bebidas refrescantes.</p>
+    </div>
+    <div class="filters">
+      <button class="filter-btn active" data-cat="all">Todos</button>
+      <button class="filter-btn" data-cat="burger">Hambúrgueres</button>
+      <button class="filter-btn" data-cat="side">Acompanhamentos</button>
+      <button class="filter-btn" data-cat="drink">Bebidas</button>
+    </div>
+    <div class="menu-grid">
+      <!-- Burgers -->
+      <div class="menu-card" data-cat="burger">
+        <div class="menu-card-img"><img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=500&h=350&fit=crop" alt="Smash Clássico" loading="lazy"></div>
+        <div class="menu-card-body">
+          <div class="menu-card-top"><span class="menu-card-name">Smash Clássico</span><span class="menu-card-price">R$ 28,90</span></div>
+          <p class="menu-card-desc">Blend de 180g, queijo cheddar, alface, tomate, cebola roxa caramelizada e molho especial da casa.</p>
+          <a href="/pedidos.html" class="btn btn-accent"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg> Adicionar</a>
+        </div>
+      </div>
+      <div class="menu-card" data-cat="burger">
+        <div class="menu-card-img"><img src="https://images.unsplash.com/photo-1553979459-d2229ba7433b?w=500&h=350&fit=crop" alt="BBQ Bacon" loading="lazy"></div>
+        <div class="menu-card-body">
+          <div class="menu-card-top"><span class="menu-card-name">BBQ Bacon</span><span class="menu-card-price">R$ 34,90</span></div>
+          <p class="menu-card-desc">Duplo smash 360g, bacon crocante, queijo pepper jack, onion rings e molho BBQ defumado.</p>
+          <a href="/pedidos.html" class="btn btn-accent"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg> Adicionar</a>
+        </div>
+      </div>
+      <div class="menu-card" data-cat="burger">
+        <div class="menu-card-img"><img src="https://images.unsplash.com/photo-1594212699903-ec8a3eca50f5?w=500&h=350&fit=crop" alt="Trufa Supreme" loading="lazy"></div>
+        <div class="menu-card-body">
+          <div class="menu-card-top"><span class="menu-card-name">Trufa Supreme</span><span class="menu-card-price">R$ 42,90</span></div>
+          <p class="menu-card-desc">Blend Angus 200g, cream cheese trufado, rúcula, tomate seco e redução de balsâmico.</p>
+          <a href="/pedidos.html" class="btn btn-accent"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg> Adicionar</a>
+        </div>
+      </div>
+      <!-- Sides -->
+      <div class="menu-card" data-cat="side" style="display:none">
+        <div class="menu-card-img"><img src="https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=500&h=350&fit=crop" alt="Batata Frita" loading="lazy"></div>
+        <div class="menu-card-body">
+          <div class="menu-card-top"><span class="menu-card-name">Batata Rústica</span><span class="menu-card-price">R$ 16,90</span></div>
+          <p class="menu-card-desc">Batatas rústicas crocantes com páprica defumada, servidas com maionese temperada.</p>
+          <a href="/pedidos.html" class="btn btn-accent"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg> Adicionar</a>
+        </div>
+      </div>
+      <div class="menu-card" data-cat="side" style="display:none">
+        <div class="menu-card-img"><img src="https://images.unsplash.com/photo-1541592106381-b31e9677c0e5?w=500&h=350&fit=crop" alt="Onion Rings" loading="lazy"></div>
+        <div class="menu-card-body">
+          <div class="menu-card-top"><span class="menu-card-name">Onion Rings</span><span class="menu-card-price">R$ 14,90</span></div>
+          <p class="menu-card-desc">Anéis de cebola empanados crocantes com molho ranch caseiro.</p>
+          <a href="/pedidos.html" class="btn btn-accent"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg> Adicionar</a>
+        </div>
+      </div>
+      <!-- Drinks -->
+      <div class="menu-card" data-cat="drink" style="display:none">
+        <div class="menu-card-img"><img src="https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=500&h=350&fit=crop" alt="Refrigerante" loading="lazy"></div>
+        <div class="menu-card-body">
+          <div class="menu-card-top"><span class="menu-card-name">Refrigerante Lata</span><span class="menu-card-price">R$ 7,90</span></div>
+          <p class="menu-card-desc">Coca-Cola, Guaraná, Fanta ou Sprite. Lata 350ml gelada.</p>
+          <a href="/pedidos.html" class="btn btn-accent"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg> Adicionar</a>
+        </div>
+      </div>
+      <div class="menu-card" data-cat="drink" style="display:none">
+        <div class="menu-card-img"><img src="https://images.unsplash.com/photo-1497034825429-c343d7c6a68f?w=500&h=350&fit=crop" alt="Milkshake" loading="lazy"></div>
+        <div class="menu-card-body">
+          <div class="menu-card-top"><span class="menu-card-name">Milkshake Artesanal</span><span class="menu-card-price">R$ 19,90</span></div>
+          <p class="menu-card-desc">Chocolate belga, morango ou baunilha. Feito com sorvete premium.</p>
+          <a href="/pedidos.html" class="btn btn-accent"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg> Adicionar</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DEPOIMENTOS -->
+<section id="avaliacoes" style="background:var(--bg2)">
+  <div class="container">
+    <div class="text-center">
+      <span class="section-badge">DEPOIMENTOS</span>
+      <h2 class="section-title">O Que Nossos Clientes Dizem</h2>
+      <p class="section-desc mx-auto">A satisfação dos nossos clientes é o nosso maior orgulho.</p>
+    </div>
+    <div class="reviews-grid">
+      <div class="review-card">
+        <div class="stars"><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span></div>
+        <p class="review-text">"Melhor hambúrguer artesanal que já comi! O Smash Clássico é simplesmente perfeito. Carne suculenta, pão macio e o molho especial é viciante."</p>
+        <div class="review-footer">
+          <div class="avatar">M</div>
+          <div><div class="review-name">Marina Silva</div><div class="review-date">Março 2026</div></div>
+        </div>
+      </div>
+      <div class="review-card">
+        <div class="stars"><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span></div>
+        <p class="review-text">"Atendimento incrível e delivery super rápido. O BBQ Bacon veio quentinho e perfeito. Já virou meu lugar favorito para pedir hambúrguer!"</p>
+        <div class="review-footer">
+          <div class="avatar">R</div>
+          <div><div class="review-name">Rafael Mendes</div><div class="review-date">Abril 2026</div></div>
+        </div>
+      </div>
+      <div class="review-card">
+        <div class="stars"><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span></div>
+        <p class="review-text">"O Trufa Supreme é uma experiência gastronômica. A qualidade dos ingredientes é evidente em cada mordida. Recomendo demais!"</p>
+        <div class="review-footer">
+          <div class="avatar">C</div>
+          <div><div class="review-name">Camila Rocha</div><div class="review-date">Maio 2026</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="text-center">
+      <div class="rating-summary">
+        <div><div class="rating-big">4.9</div><div class="rating-sub">/ 5.0</div></div>
+        <div>
+          <div class="rating-stars"><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span><span class="star">&#9733;</span></div>
+          <div style="color:var(--text3);font-size:.8rem;margin-top:2px">Baseado em 500+ avaliações</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-brand"><img src="/img/logo.png" alt="Logo"> Sabor e Brasa</div>
+        <p class="footer-desc">Hambúrgueres artesanais feitos com paixão e os melhores ingredientes. Desde 2020 levando sabor autêntico à sua mesa.</p>
+      </div>
+      <div>
+        <div class="footer-title">Navegação</div>
+        <ul class="footer-links">
+          <li><a href="#inicio">Início</a></li>
+          <li><a href="#menu">Cardápio</a></li>
+          <li><a href="#sobre">Sobre Nós</a></li>
+          <li><a href="#avaliacoes">Avaliações</a></li>
+          <li><a href="/pedidos.html">Fazer Pedido</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-title">Contato</div>
+        <ul class="footer-links">
+          <li><a href="#">Rua das Brasas, 123</a></li>
+          <li><a href="#">(11) 99999-9999</a></li>
+          <li><a href="#">contato@saborbrasa.com</a></li>
+          <li><a href="#">Seg-Dom: 11h - 23h</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bar">&copy; 2026 Sabor e Brasa. Todos os direitos reservados.</div>
+  </div>
+</footer>
+
+<script src="/js/landing.js"></script>
+</body>
+</html>

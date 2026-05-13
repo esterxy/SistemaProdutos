@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using SistemaProdutos.Models;
 using SistemaProdutos.Repositories;
 
@@ -8,10 +8,10 @@ namespace SistemaProdutos.Controllers;
 [ApiController]
 public class CategoriasController : ControllerBase
 {
-    private readonly UnitOfWork _uof;
+    private readonly IUnitOfWork _uof;
     private readonly ILogger<CategoriasController> _logger;
 
-    public CategoriasController(UnitOfWork uof, ILogger<CategoriasController> logger)
+    public CategoriasController(IUnitOfWork uof, ILogger<CategoriasController> logger)
     {
         _uof = uof;
         _logger = logger;
@@ -69,7 +69,7 @@ public class CategoriasController : ControllerBase
     [HttpDelete("{id:int}")]
     public ActionResult Delete(int id)
     {
-        var categoria = _uof.Get(c => c.CategoriaId == id);
+        var categoria = _uof.CategoriaRepository.Get(c => c.CategoriaId == id);
 
         if (categoria == null)
         {
@@ -81,4 +81,4 @@ public class CategoriasController : ControllerBase
         _uof.Commit();
         return Ok(categoriaExcluida);
     }
-}
+}

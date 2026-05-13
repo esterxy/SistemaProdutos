@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using SistemaProdutos.Models;
 using SistemaProdutos.Repositories;
 
@@ -32,17 +32,27 @@ namespace SistemaProdutos.Controllers
 
         // GET: api/Produtos
         [HttpGet]
-        public ActionResult<IQueryable<Produto>> Get()
+        public ActionResult<IQueryable<Produto>> Get([FromQuery] string? nome, [FromQuery] int? categoriaId)
         {
             _logger.LogInformation($"=========================== Iniciando a execução do método GetProdutos ===========================");
 
-            var produto = _uof.ProdutoRepository.GetAll();
-            if (produto is null)
+            var produtos = _uof.ProdutoRepository.GetAll();
+            if (produtos is null)
             {
                 return NotFound();
             }
 
-            return Ok(produto);
+            if (!string.IsNullOrEmpty(nome))
+            {
+                produtos = produtos.Where(p => p.Nome.Contains(nome, StringComparison.OrdinalIgnoreCase)).AsQueryable();
+            }
+
+            if (categoriaId.HasValue)
+            {
+                produtos = produtos.Where(p => p.CategoriaId == categoriaId.Value).AsQueryable();
+            }
+
+            return Ok(produtos);
         }
 
         // GET: api/Produtos/5
