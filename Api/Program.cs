@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.OpenApi;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using SistemaProdutos.Context;
@@ -14,7 +15,23 @@ var builder = WebApplication.CreateBuilder(args);
 // SERVIÇOS
 // =============================================
 builder.Services.AddControllers();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Sistema Produtos API", Version = "v1" });
+
+    // Configuração do JWT no Swagger
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "Insira o token JWT desta forma: Bearer {seu_token}"
+    });
+
+    c.OperationFilter<AuthorizeCheckOperationFilter>();
+});
 builder.Services.AddOpenApi();
 
 // Banco de dados (MySQL)
