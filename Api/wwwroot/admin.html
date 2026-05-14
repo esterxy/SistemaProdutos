@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sabor e Brasa - Painel Administrativo</title>
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="admin-logo-wrapper">
+                    <img src="/img/logo.png" alt="S&B Logo" class="admin-logo-img">
+                    S&B Admin
+                </div>
+                <button class="close-menu" id="closeMenuBtn"><i data-lucide="x"></i></button>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-item active" data-target="dashboard">
+                    <i data-lucide="layout-dashboard"></i> Visão Geral
+                </a>
+                <a href="#" class="nav-item" data-target="pedidos">
+                    <i data-lucide="shopping-bag"></i> Pedidos
+                </a>
+                <a href="#" class="nav-item" data-target="produtos">
+                    <i data-lucide="package"></i> Produtos
+                </a>
+                <a href="#" class="nav-item" data-target="categorias">
+                    <i data-lucide="tags"></i> Categorias
+                </a>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <a href="index.html" class="nav-item">
+                    <i data-lucide="arrow-left"></i> Voltar ao site
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="top-header">
+                <div class="header-left">
+                    <button class="menu-toggle" id="menuToggleBtn"><i data-lucide="menu"></i></button>
+                    <h1 class="logo">Sabor e Brasa</h1>
+                </div>
+                
+                <div class="header-center hidden-mobile">
+                    <!-- Links mockados -->
+                    <a href="index.html">Home</a>
+                    <a href="index.html#cardapio">Cardápio</a>
+                </div>
+                
+                <div class="header-right">
+                    <div class="live-indicator">
+                        <span class="dot"></span> Ao vivo
+                    </div>
+                    <div class="date-display hidden-mobile" id="currentDate"></div>
+                    <button class="icon-btn"><i data-lucide="shopping-cart"></i></button>
+                    <div class="user-profile">
+                        <img src="https://ui-avatars.com/api/?name=Admin&background=111827&color=fff" alt="Perfil">
+                    </div>
+                </div>
+            </header>
+
+            <!-- Views Container -->
+            <div class="views-container">
+                
+                <!-- View: Visão Geral (Dashboard) -->
+                <section id="view-dashboard" class="view active">
+                    <header class="view-header">
+                        <h2>Visão Geral</h2>
+                        <p class="subtitle">Resumo de desempenho do dia.</p>
+                    </header>
+                    
+                    <!-- KPIs -->
+                    <div class="kpi-grid">
+                        <div class="kpi-card">
+                            <div class="kpi-info">
+                                <span class="kpi-label">Receita Hoje</span>
+                                <h3 class="kpi-value">R$ 1.240,50</h3>
+                            </div>
+                            <div class="kpi-trend positive"><i data-lucide="trending-up"></i> +12%</div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-info">
+                                <span class="kpi-label">Pedidos Hoje</span>
+                                <h3 class="kpi-value">45</h3>
+                            </div>
+                            <div class="kpi-trend positive"><i data-lucide="trending-up"></i> +5%</div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-info">
+                                <span class="kpi-label">Ticket Médio</span>
+                                <h3 class="kpi-value">R$ 27,56</h3>
+                            </div>
+                            <div class="kpi-trend negative"><i data-lucide="trending-down"></i> -2%</div>
+                        </div>
+                    </div>
+                    
+                    <div class="dashboard-grid">
+                        <!-- Chart -->
+                        <div class="chart-card">
+                            <h3>Faturamento dos últimos 7 dias</h3>
+                            <div class="chart-container">
+                                <canvas id="revenueChart"></canvas>
+                            </div>
+                        </div>
+                        
+                        <!-- Pipeline -->
+                        <div class="widget-card">
+                            <h3>Pipeline de Pedidos</h3>
+                            <div id="pipelineContainer" class="pipeline-list"></div>
+                        </div>
+                        
+                        <!-- Last Orders -->
+                        <div class="latest-orders-card">
+                            <h3>Últimos Pedidos</h3>
+                            <div id="latestOrdersContainer" class="orders-list-simple"></div>
+                        </div>
+                        
+                        <!-- Right Column Widgets -->
+                        <div class="widgets-column">
+                            <!-- Mais Vendidos -->
+                            <div class="widget-card">
+                                <h3>Mais Vendidos</h3>
+                                <div id="topSellersContainer" class="top-sellers-list"></div>
+                            </div>
+                            
+                            <!-- Ações Rápidas -->
+                            <div class="widget-card quick-actions">
+                                <h3>Ações Rápidas</h3>
+                                <button class="btn btn-outline w-full mb-2" onclick="switchTab('produtos')">Gerenciar Cardápio</button>
+                                <button class="btn btn-outline w-full mb-2" onclick="switchTab('pedidos')">Ver Pedidos Pendentes</button>
+                                <button class="btn btn-outline w-full">Configurações da Loja</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- View: Pedidos -->
+                <section id="view-pedidos" class="view">
+                    <header class="view-header flex-between">
+                        <div>
+                            <h2>Gerenciamento de Pedidos</h2>
+                            <p class="subtitle">Acompanhe e atualize o status dos pedidos.</p>
+                        </div>
+                    </header>
+                    
+                    <!-- Filtros -->
+                    <div class="filters-bar">
+                        <button class="pill-btn active" data-filter="Todos">Todos</button>
+                        <button class="pill-btn" data-filter="Aguardando">Aguardando</button>
+                        <button class="pill-btn" data-filter="Pago">Pagos</button>
+                        <button class="pill-btn" data-filter="Preparando">Preparando</button>
+                        <button class="pill-btn" data-filter="Concluído">Concluídos</button>
+                        <button class="pill-btn" data-filter="Cancelado">Cancelados</button>
+                    </div>
+                    
+                    <!-- Lista de Pedidos -->
+                    <div id="ordersListContainer" class="orders-cards-grid">
+                        <!-- Orders rendered via JS -->
+                    </div>
+                </section>
+
+                <!-- View: Produtos -->
+                <section id="view-produtos" class="view">
+                    <header class="view-header flex-between">
+                        <div>
+                            <h2>Produtos</h2>
+                            <p class="subtitle">Gerencie o seu cardápio de produtos.</p>
+                        </div>
+                        <button class="btn btn-dark" onclick="abrirProductModal()"><i data-lucide="plus"></i> Novo produto</button>
+                    </header>
+                    
+                    <div id="productsListContainer" class="products-list">
+                        <!-- Products rendered via JS -->
+                    </div>
+                </section>
+
+                <!-- View: Categorias -->
+                <section id="view-categorias" class="view">
+                    <header class="view-header flex-between">
+                        <div>
+                            <h2>Categorias</h2>
+                            <p class="subtitle">Organize os produtos por categorias.</p>
+                        </div>
+                        <button class="btn btn-dark"><i data-lucide="plus"></i> Nova categoria</button>
+                    </header>
+                    
+                    <div id="categoriesListContainer" class="categories-grid">
+                        <!-- Categories rendered via JS -->
+                    </div>
+                </section>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- Script overlay for mobile sidebar -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Modals -->
+    <!-- Modal: Detalhes do Pedido -->
+    <div id="orderModal" class="admin-modal-overlay">
+        <div class="admin-modal-card">
+            <button class="admin-modal-close" onclick="fecharOrderModal()">
+                <i data-lucide="x"></i>
+            </button>
+            <h3 class="admin-modal-title" id="orderModalTitle">Detalhes do Pedido #0</h3>
+            <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom: 1.5rem" id="orderModalClient">Cliente: -</p>
+            <div id="orderModalItems" style="margin-bottom: 1.5rem;">
+                <!-- Itens injetados via JS -->
+            </div>
+            <div class="order-detail-total" id="orderModalTotal">Total: R$ 0,00</div>
+        </div>
+    </div>
+
+    <!-- Modal: Novo Produto -->
+    <div id="productModal" class="admin-modal-overlay">
+        <div class="admin-modal-card">
+            <button class="admin-modal-close" onclick="fecharProductModal()">
+                <i data-lucide="x"></i>
+            </button>
+            <h3 class="admin-modal-title">Novo Produto</h3>
+            <div class="form-group">
+                <label class="form-label">Nome do Produto</label>
+                <input type="text" id="prodNome" class="form-input" placeholder="Ex: X-Bacon Artesanal">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Descrição</label>
+                <input type="text" id="prodDesc" class="form-input" placeholder="Ex: Pão brioche, blend 160g...">
+            </div>
+            <div style="display:flex; gap:1rem">
+                <div class="form-group" style="flex:1">
+                    <label class="form-label">Preço (R$)</label>
+                    <input type="number" id="prodPreco" class="form-input" step="0.01" min="0" placeholder="0.00">
+                </div>
+                <div class="form-group" style="flex:1">
+                    <label class="form-label">Estoque Inicial</label>
+                    <input type="number" id="prodEstoque" class="form-input" value="0" min="0">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Categoria</label>
+                <select id="prodCat" class="form-select">
+                    <!-- Categorias injetadas via JS -->
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">URL da Imagem (Opcional)</label>
+                <input type="text" id="prodImg" class="form-input" placeholder="https://...">
+            </div>
+            <button class="btn btn-dark w-full mt-2" onclick="salvarNovoProduto()">Salvar Produto</button>
+        </div>
+    </div>
+
+    <script src="js/admin.js"></script>
+</body>
+</html>

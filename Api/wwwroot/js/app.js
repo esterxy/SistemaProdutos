@@ -240,6 +240,12 @@ function mostrarApp() {
     document.getElementById('app').style.display = 'block';
     const nome = (localStorage.getItem('jwt_user') || '').trim();
     userRole = localStorage.getItem('jwt_role') || '';
+
+    if (userRole === 'admin') {
+        window.location.href = '/admin.html';
+        return;
+    }
+
     const badgeEl = document.getElementById('userBadge');
     badgeEl.textContent = nome || '—';
     if (userRole === 'admin') badgeEl.classList.add('admin-badge');

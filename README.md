@@ -33,14 +33,14 @@
 ### 🔐 Tela de Login
 ![Tela de Login](docs/screenshots/login.png)
 
-### 👑 Painel Admin — Início (Cardápio + Carrinho)
-![Admin Início](docs/screenshots/admin_inicio.png)
+### 👑 Novo Painel Admin — Visão Geral (Dashboard)
+![Admin Dashboard](docs/screenshots/Captura de tela 2026-05-14 192131.png)
 
-### 👑 Painel Admin — Todos os Pedidos
-![Admin Pedidos](docs/screenshots/admin_pedidos.png)
+### 👑 Novo Painel Admin — Gestão de Pedidos
+![Admin Pedidos](docs/screenshots/Captura de tela 2026-05-14 192027.png)
 
-### 👑 Painel Admin — Gestão de Estoque
-![Admin Estoque](docs/screenshots/admin_estoque.png)
+### 👑 Novo Painel Admin — Gestão de Produtos e Categorias
+![Admin Estoque](docs/screenshots/Captura de tela 2026-05-14 192719.png)
 
 ---
 
@@ -66,11 +66,13 @@
 - **Isolamento de dados**: cliente vê apenas seus próprios pedidos
 - **Filtro por categoria**: Bebidas, Lanches, Sobremesas, etc.
 
-### 👑 Painel Administrativo
-- **Navbar unificada** com abas: Início, Pedidos, Estoque
-- **Visão global**: admin vê todos os pedidos de todos os clientes
-- **Gestão de estoque**: atualização de quantidades por produto
-- **Cancelamento com rastreio**: pedidos cancelados pelo admin aparecem como *"Cancelado pela loja"* para o cliente
+### 👑 Novo Painel Administrativo (Standalone)
+- **Identidade Visual Premium**: Dark theme exclusivo baseado nas cores da marca Sabor & Brasa.
+- **Dashboard e Métricas Reais**: Cards de KPIs (Receita de Hoje, Total de Pedidos, Ticket Médio).
+- **Gráficos Integrados**: Acompanhamento visual do faturamento dos últimos 7 dias (via Chart.js).
+- **Gestão Avançada de Pedidos**: Visualização global com filtros por status e um modal dinâmico de detalhes do pedido (exibindo itens e valores).
+- **Gestão de Catálogo**: Tela dedicada para listagem e adição de novos produtos (com modal de criação) e associação a categorias.
+- **Cancelamento com rastreio**: pedidos cancelados pelo admin aparecem como *"Cancelado pela loja"* para o cliente.
 
 ### 🔄 Cancelamento Inteligente
 | Quem cancela | Status exibido |
@@ -99,10 +101,15 @@ SistemaProdutos-1/
 │   ├── Repositories/        # Repository Pattern + Unit of Work
 │   ├── Services/            # PedidoService (business logic)
 │   ├── wwwroot/
-│   │   ├── css/styles.css   # Design system completo
-│   │   ├── js/app.js        # Frontend SPA (vanilla JS)
+│   │   ├── css/
+│   │   │   ├── styles.css   # Design system da loja
+│   │   │   └── admin.css    # Estilização exclusiva do Painel Admin (Dark Theme)
+│   │   ├── js/
+│   │   │   ├── app.js       # Frontend SPA (vanilla JS) - Clientes
+│   │   │   └── admin.js     # Frontend SPA (vanilla JS) - Dashboard Admin
 │   │   ├── img/             # Logo e assets
-│   │   └── pedidos.html     # Página principal
+│   │   ├── pedidos.html     # Página principal de vendas
+│   │   └── admin.html       # Nova página isolada do Painel Administrativo
 │   ├── Program.cs           # Configuração e middleware
 │   └── appsettings.json     # ConnectionString, JWT config
 └── docs/screenshots/        # Screenshots da aplicação

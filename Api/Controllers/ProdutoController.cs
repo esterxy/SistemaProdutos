@@ -99,7 +99,8 @@ namespace SistemaProdutos.Controllers
             {
                 return BadRequest();
             }
-            var novoProduto = _uof.ProdutoRepository.Update(produto);
+            produto.DataCadastro = DateTime.Now;
+            var novoProduto = _uof.ProdutoRepository.Create(produto);
             _uof.Commit();
 
             return new CreatedAtRouteResult("ObterProduto", new { id = novoProduto.ProdutoId }, novoProduto);
