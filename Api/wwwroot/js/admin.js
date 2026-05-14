@@ -159,8 +159,8 @@ function renderDashboard() {
         const orderDate = new Date(o.dataPedido).toDateString();
         if (orderDate === hojeStr) {
             pedidosHoje++;
-            // Apenas pedidos que não foram cancelados contam para receita
-            if (!o.status.startsWith('Cancelado')) {
+            // Apenas pedidos concluídos contam para receita
+            if (o.status === 'Concluído') {
                 receitaHoje += o.valorTotal;
             }
         }
@@ -186,7 +186,7 @@ function renderDashboard() {
         
         // Sum revenue for this day
         const dayStr = d.toDateString();
-        const dailyRev = allOrders.filter(o => !o.status.startsWith('Cancelado') && new Date(o.dataPedido).toDateString() === dayStr)
+        const dailyRev = allOrders.filter(o => o.status === 'Concluído' && new Date(o.dataPedido).toDateString() === dayStr)
             .reduce((sum, o) => sum + o.valorTotal, 0);
         chartData.push(dailyRev);
     }
@@ -416,10 +416,11 @@ function renderProducts() {
             </div>
             <div class="product-meta">
                 <span class="badge" style="background-color: var(--glass); color: var(--text-muted); border: 1px solid var(--border-color)">${catName}</span>
+                <span style="font-size: 0.85rem; color: var(--text-muted);">Estoque: <strong style="color: var(--text-main);">${p.estoque || 0}</strong> un.</span>
                 <span class="product-price">R$ ${p.preco.toFixed(2).replace('.', ',')}</span>
                 <div class="product-actions" style="margin-top: 0.5rem">
-                    <button class="btn btn-outline" style="padding: 0.4rem 0.6rem" title="Editar"><i data-lucide="edit-2" style="width: 14px; height: 14px;"></i></button>
-                    <button class="btn btn-outline" style="padding: 0.4rem 0.6rem; color: var(--status-cancel); border-color: var(--status-cancel-bg);" title="Remover"><i data-lucide="trash-2" style="width: 14px; height: 14px;"></i></button>
+                    <button class="btn btn-outline" style="padding: 0.4rem 0.6rem" title="Editar" onclick="abrirProductModal(${p.produtoId})"><i data-lucide="edit-2" style="width: 14px; height: 14px;"></i></button>
+                    <button class="btn btn-outline" style="padding: 0.4rem 0.6rem; color: var(--status-cancel); border-color: var(--status-cancel-bg);" title="Remover" onclick="deletarProduto(${p.produtoId})"><i data-lucide="trash-2" style="width: 14px; height: 14px;"></i></button>
                 </div>
             </div>
         </div>
@@ -520,25 +521,45 @@ window.fecharOrderModal = function() {
     document.getElementById('orderModal').style.display = 'none';
 }
 
+let editingProductId = null;
+
 // -- Product Modal --
-window.abrirProductModal = function() {
+window.abrirProductModal = function(id = null) {
+    editingProductId = id;
+
     // Populate categories select
     const select = document.getElementById('prodCat');
     select.innerHTML = '<option value="">Selecione uma categoria...</option>' + 
         allCategories.map(c => `<option value="${c.categoriaId}">${c.nome}</option>`).join('');
 
-    // Clear form
-    document.getElementById('prodNome').value = '';
-    document.getElementById('prodDesc').value = '';
-    document.getElementById('prodPreco').value = '';
-    document.getElementById('prodEstoque').value = '0';
-    document.getElementById('prodImg').value = '';
+    if (id) {
+        const prod = allProducts.find(p => p.produtoId === id);
+        if (prod) {
+            document.querySelector('#productModal .admin-modal-title').textContent = 'Editar Produto';
+            document.getElementById('prodNome').value = prod.nome || '';
+            document.getElementById('prodDesc').value = prod.descricao || '';
+            document.getElementById('prodPreco').value = prod.preco || '';
+            document.getElementById('prodEstoque').value = prod.estoque || '0';
+            document.getElementById('prodCat').value = prod.categoriaId || '';
+            document.getElementById('prodImg').value = prod.imageUrl || '';
+        }
+    } else {
+        // Clear form
+        document.querySelector('#productModal .admin-modal-title').textContent = 'Novo Produto';
+        document.getElementById('prodNome').value = '';
+        document.getElementById('prodDesc').value = '';
+        document.getElementById('prodPreco').value = '';
+        document.getElementById('prodEstoque').value = '0';
+        document.getElementById('prodCat').value = '';
+        document.getElementById('prodImg').value = '';
+    }
 
     document.getElementById('productModal').style.display = 'flex';
 }
 
 window.fecharProductModal = function() {
     document.getElementById('productModal').style.display = 'none';
+    editingProductId = null;
 }
 
 window.salvarNovoProduto = async function() {
@@ -579,7 +600,86 @@ window.salvarNovoProduto = async function() {
     };
 
     try {
-        const response = await fetch(`${API_BASE}/api/Produtos`, {
+        let response;
+        if (editingProductId) {
+            payload.produtoId = editingProductId;
+            response = await fetch(`${API_BASE}/api/Produtos/${editingProductId}`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${authToken}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            });
+        } else {
+            response = await fetch(`${API_BASE}/api/Produtos`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${authToken}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            });
+        }
+
+        if(response.ok) {
+            fecharProductModal();
+            await carregarDadosIniciais();
+            alert(editingProductId ? "Produto atualizado com sucesso!" : "Produto adicionado com sucesso!");
+        } else {
+            const err = await response.json();
+            alert("Erro ao salvar produto: " + (err.message || ""));
+        }
+    } catch(e) {
+        alert("Erro de conexão ao salvar.");
+    }
+}
+
+window.deletarProduto = async function(id) {
+    if(!confirm("Tem certeza que deseja remover este produto?")) return;
+    try {
+        const response = await fetch(`${API_BASE}/api/Produtos/${id}`, {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+        if (response.ok) {
+            await carregarDadosIniciais();
+        } else {
+            const err = await response.json().catch(() => ({}));
+            alert(err.message || "Erro ao remover o produto.");
+        }
+    } catch(e) {
+        alert("Erro de conexão.");
+    }
+}
+
+// -- Category Modal --
+window.abrirCategoriaModal = function() {
+    document.getElementById('catNome').value = '';
+    document.getElementById('catImg').value = '';
+    document.getElementById('categoriaModal').style.display = 'flex';
+}
+
+window.fecharCategoriaModal = function() {
+    document.getElementById('categoriaModal').style.display = 'none';
+}
+
+window.salvarNovaCategoria = async function() {
+    const nome = document.getElementById('catNome').value.trim();
+    const imgUrl = document.getElementById('catImg').value.trim();
+
+    if(!nome) {
+        alert("O nome da categoria é obrigatório.");
+        return;
+    }
+
+    const payload = {
+        nome: nome,
+        imagemUrl: imgUrl || "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=500&h=350&fit=crop"
+    };
+
+    try {
+        const response = await fetch(`${API_BASE}/api/Categorias`, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${authToken}`,
@@ -589,14 +689,14 @@ window.salvarNovoProduto = async function() {
         });
 
         if(response.ok) {
-            fecharProductModal();
+            fecharCategoriaModal();
             await carregarDadosIniciais();
-            alert("Produto adicionado com sucesso!");
+            alert("Categoria adicionada com sucesso!");
         } else {
             const err = await response.json();
-            alert("Erro ao salvar produto: " + (err.message || ""));
+            alert("Erro ao salvar categoria: " + (err.message || ""));
         }
     } catch(e) {
-        alert("Erro de conexão ao salvar.");
+        alert("Erro de conexão ao salvar categoria.");
     }
 }

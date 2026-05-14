@@ -115,13 +115,18 @@ namespace SistemaProdutos.Controllers
             {
                 return NotFound();
             }
-            var produtoDeletado = _uof.ProdutoRepository.Delete(produto);
-            _uof.Commit();
-            return Ok(produtoDeletado);
 
-
-
-
+            try
+            {
+                var produtoDeletado = _uof.ProdutoRepository.Delete(produto);
+                _uof.Commit();
+                return Ok(produtoDeletado);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Erro ao deletar o produto {id}. Pode estar vinculado a um pedido.");
+                return BadRequest(new { message = "Não é possível excluir este produto pois ele já está vinculado a um ou mais pedidos." });
+            }
         }
 
         /// <summary>

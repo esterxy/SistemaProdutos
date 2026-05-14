@@ -67,7 +67,6 @@
                         <span class="dot"></span> Ao vivo
                     </div>
                     <div class="date-display hidden-mobile" id="currentDate"></div>
-                    <button class="icon-btn"><i data-lucide="shopping-cart"></i></button>
                     <div class="user-profile">
                         <img src="https://ui-avatars.com/api/?name=Admin&background=111827&color=fff" alt="Perfil">
                     </div>
@@ -196,7 +195,7 @@
                             <h2>Categorias</h2>
                             <p class="subtitle">Organize os produtos por categorias.</p>
                         </div>
-                        <button class="btn btn-dark"><i data-lucide="plus"></i> Nova categoria</button>
+                        <button class="btn btn-dark" onclick="abrirCategoriaModal()"><i data-lucide="plus"></i> Nova categoria</button>
                     </header>
                     
                     <div id="categoriesListContainer" class="categories-grid">
@@ -263,6 +262,25 @@
                 <input type="text" id="prodImg" class="form-input" placeholder="https://...">
             </div>
             <button class="btn btn-dark w-full mt-2" onclick="salvarNovoProduto()">Salvar Produto</button>
+        </div>
+    </div>
+
+    <!-- Modal: Nova Categoria -->
+    <div id="categoriaModal" class="admin-modal-overlay">
+        <div class="admin-modal-card">
+            <button class="admin-modal-close" onclick="fecharCategoriaModal()">
+                <i data-lucide="x"></i>
+            </button>
+            <h3 class="admin-modal-title">Nova Categoria</h3>
+            <div class="form-group">
+                <label class="form-label">Nome da Categoria</label>
+                <input type="text" id="catNome" class="form-input" placeholder="Ex: Bebidas">
+            </div>
+            <div class="form-group">
+                <label class="form-label">URL da Imagem</label>
+                <input type="text" id="catImg" class="form-input" placeholder="https://...">
+            </div>
+            <button class="btn btn-dark w-full mt-2" onclick="salvarNovaCategoria()">Salvar Categoria</button>
         </div>
     </div>
 
