@@ -260,7 +260,16 @@ function mostrarApp() {
     carregarProdutos();
     carregarCategorias();
     carregarPedidos();
-    if (userRole === 'admin') carregarEstoque();
+    if (userRole === 'admin') {
+        carregarEstoque();
+    } else {
+        // Para clientes, atualiza o cardápio automaticamente a cada 15 segundos
+        if (!window.menuPollInterval) {
+            window.menuPollInterval = setInterval(() => {
+                carregarProdutos();
+            }, 15000);
+        }
+    }
 }
 
 function navAdmin(tab, btn) {
@@ -307,7 +316,7 @@ async function carregarProdutos() {
 }
 
 function obterImagemProduto(produto) {
-    if (typeof produto === 'object' && produto.imageUrl && produto.imageUrl.startsWith('http')) return produto.imageUrl;
+    if (typeof produto === 'object' && produto.imageUrl && produto.imageUrl.length > 3) return produto.imageUrl;
     const nome = typeof produto === 'string' ? produto : produto?.nome;
     if (!nome) return FOOD_IMAGES['default'];
     const nomeLower = nome.toLowerCase();

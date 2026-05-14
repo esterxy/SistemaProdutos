@@ -8,6 +8,13 @@ if (!authToken || localStorage.getItem('jwt_role') !== 'admin') {
     window.location.href = '/index.html';
 }
 
+// Logout
+window.logoutAdmin = function() {
+    localStorage.removeItem('jwt');
+    localStorage.removeItem('jwt_role');
+    window.location.href = '/index.html';
+};
+
 // Global Data
 let allOrders = [];
 let allProducts = [];
@@ -46,7 +53,7 @@ const FOOD_IMAGES = {
 };
 
 function obterImagemProduto(produto) {
-    if (typeof produto === 'object' && produto.imageUrl && produto.imageUrl.startsWith('http')) return produto.imageUrl;
+    if (typeof produto === 'object' && produto.imageUrl && produto.imageUrl.length > 3) return produto.imageUrl;
     const nome = typeof produto === 'string' ? produto : produto?.nome;
     if (!nome) return FOOD_IMAGES['default'];
     const nomeLower = nome.toLowerCase();
@@ -587,7 +594,7 @@ window.salvarNovoProduto = async function() {
         return;
     }
     if(!imgUrl || imgUrl.length < 10) {
-        imgUrl = "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=500&h=350&fit=crop"; // fallback válido
+        imgUrl = obterImagemProduto(nome); // fallback contextual pelo nome
     }
 
     const payload = {

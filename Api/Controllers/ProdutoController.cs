@@ -83,11 +83,27 @@ namespace SistemaProdutos.Controllers
                 return BadRequest();
             }
 
-            var produtoAtualizado = _uof.ProdutoRepository.Update(produto);
+            var produtoExistente = _uof.ProdutoRepository.Get(p => p.ProdutoId == id);
+            if (produtoExistente == null)
+            {
+                return NotFound();
+            }
+
+            // Atualiza apenas os campos permitidos, mantendo a DataCadastro original
+            produtoExistente.Nome = produto.Nome;
+            produtoExistente.Descricao = produto.Descricao;
+            produtoExistente.Preco = produto.Preco;
+            produtoExistente.Estoque = produto.Estoque;
+            produtoExistente.CategoriaId = produto.CategoriaId;
+            if (!string.IsNullOrEmpty(produto.ImageUrl))
+            {
+                produtoExistente.ImageUrl = produto.ImageUrl;
+            }
+
+            var produtoAtualizado = _uof.ProdutoRepository.Update(produtoExistente);
             _uof.Commit();
 
             return Ok(produtoAtualizado);
-
         }
 
         // POST: api/Produtos
