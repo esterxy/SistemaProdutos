@@ -34,13 +34,13 @@
 ![Tela de Login](docs/screenshots/login.png)
 
 ### 👑 Novo Painel Admin — Visão Geral (Dashboard)
-![Admin Dashboard](docs/screenshots/Captura de tela 2026-05-14 192131.png)
+![Admin Dashboard](docs/screenshots/VisaoGeral.png)
 
 ### 👑 Novo Painel Admin — Gestão de Pedidos
-![Admin Pedidos](docs/screenshots/Captura de tela 2026-05-14 192027.png)
+![Admin Pedidos](docs/screenshots/GestaoPedidos.png)
 
 ### 👑 Novo Painel Admin — Gestão de Produtos e Categorias
-![Admin Estoque](docs/screenshots/Captura de tela 2026-05-14 192719.png)
+![Admin Estoque](docs/screenshots/GestaoProdutos.png)
 
 ---
 
