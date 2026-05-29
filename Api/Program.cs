@@ -13,6 +13,13 @@ using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Configuração de porta dinâmica para o Render
+var port = Environment.GetEnvironmentVariable("PORT");
+if (!string.IsNullOrEmpty(port))
+{
+    builder.WebHost.UseUrls($"http://*:{port}");
+}
+
 // =============================================
 // SERVIÇOS
 // =============================================
@@ -151,6 +158,25 @@ builder.Logging.AddConsole();
 
 var app = builder.Build();
 
+// Aplicar migrações automáticas em produção/nuvem (Docker/Render)
+if (!app.Environment.IsDevelopment())
+{
+    using (var scope = app.Services.CreateScope())
+    {
+        var services = scope.ServiceProvider;
+        try
+        {
+            var context = services.GetRequiredService<AppDbContext>();
+            context.Database.Migrate();
+            app.Logger.LogInformation("Migrações aplicadas com sucesso no banco de dados.");
+        }
+        catch (Exception ex)
+        {
+            app.Logger.LogError(ex, "Erro ao aplicar migrações no banco de dados.");
+        }
+    }
+}
+
 // =============================================
 // MIDDLEWARE (ordem importa!)
 // =============================================
@@ -171,7 +197,11 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-app.UseHttpsRedirection();
+// Em desenvolvimento ou em ambientes de nuvem (como Render), evitamos o redirecionamento HTTPS interno
+if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("PORT")))
+{
+    app.UseHttpsRedirection();
+}
 
 // Arquivos estáticos (wwwroot — frontend). Em desenvolvimento evita cache agressivo do app.js.
 var staticFiles = new StaticFileOptions();

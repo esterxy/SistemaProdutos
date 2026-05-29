@@ -1,0 +1,19 @@
+# Pastas de compilação local e IDEs
+**/bin/
+**/obj/
+.vs/
+.vscode/
+out/
+publish/
+
+# Controle de versão e documentação
+.git/
+.gitignore
+.gitattributes
+docs/
+*.md
+
+# Configurações locais sensíveis
+*.user
+**/appsettings.Development.json
+**/appsettings.local.json

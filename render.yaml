@@ -1,0 +1,44 @@
+services:
+  # =========================================================================
+  # 1. Banco de Dados MySQL (Serviço Privado e Persistente)
+  # Nota: Serviços do tipo 'private' com 'disk' requerem planos pagos no Render
+  # (a partir de $7/mês). Se preferir manter-se 100% no plano gratuito, você
+  # pode remover este bloco do banco e usar um provedor externo gratuito de MySQL
+  # (como Clever Cloud, Aiven ou Railway) definindo a ConnectionString no painel.
+  # =========================================================================
+  - type: private
+    name: sabor-brasa-db
+    runtime: image
+    image: mysql:8.0
+    envVars:
+      - key: MYSQL_ROOT_PASSWORD
+        value: cimatec
+      - key: MYSQL_DATABASE
+        value: CatalogoDB
+    disk:
+      name: mysql-data
+      mountPath: /var/lib/mysql
+      sizeGB: 1
+
+  # =========================================================================
+  # 2. Serviço Web (API ASP.NET Core 10 + Frontend SPA embutido)
+  # Este serviço constrói automaticamente a imagem a partir do Dockerfile
+  # =========================================================================
+  - type: web
+    name: sabor-brasa-api
+    runtime: docker
+    plan: free # Usa o plano gratuito do Render para a API/Frontend
+    envVars:
+      # Conecta a API ao banco de dados MySQL privado definido acima
+      - key: ConnectionStrings__ConexaoPadrao
+        value: Server=sabor-brasa-db;Database=CatalogoDB;user=root;Password=cimatec;Port=3306;
+      
+      # Configurações do JWT (ajuste a Key em produção no painel do Render se necessário)
+      - key: Jwt__Key
+        value: S1st3m4Pr0dut0s-Ch4v3-S3cr3t4-JWT-2026!@#$%
+      - key: Jwt__Issuer
+        value: SistemaProdutos.Api
+      - key: Jwt__Audience
+        value: SistemaProdutos.Client
+      - key: Jwt__ExpireMinutes
+        value: "60"
